@@ -84,7 +84,6 @@ void timer_func() {
     // Reset the step pins
     digitalWrite(ROTARY_STEP, LOW);
     digitalWrite(LINEAR_STEP, LOW);
-    digitalWrite(13, LOW);
     phase = PHASE_DOWN_EDGE;
   } else if(phase == PHASE_DOWN_EDGE) {
     phase = PHASE_UP_EDGE;
@@ -95,7 +94,6 @@ int do_step(int step_pin, int dir_pin, int increment) {
   if(increment != 0) {
     digitalWrite(dir_pin, increment == 1);
     digitalWrite(step_pin, HIGH);
-    digitalWrite(13, HIGH);
   }
   return increment;
 }
@@ -135,25 +133,7 @@ void do_move(int x, int y, int interval) {
         cur_theta += STEPS_PER_CIRCLE;
     }
     phase = PHASE_IDLE;
-    /*if(i % 256 == 0) {
-      Serial.print("r = ");
-      Serial.print(cur_r);
-      Serial.print(", theta = ");
-      Serial.print(cur_theta);
-      Serial.print(", x = ");
-      Serial.print(cur_x);
-      Serial.print(", y = ");
-      Serial.println(cur_y);
-    }*/
   }
-  /*Serial.print("r = ");
-  Serial.print(cur_r);
-  Serial.print(", theta = ");
-  Serial.print(cur_theta);
-  Serial.print(", x = ");
-  Serial.print(cur_x);
-  Serial.print(", y = ");
-  Serial.println(cur_y);*/
 
   Timer1.detachInterrupt();
   delayMicroseconds(1);
