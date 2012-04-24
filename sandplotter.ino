@@ -5,6 +5,8 @@
 
 #define sign(x) ((x > 0) - (x < 0))
 
+// #define DEBUG
+
 #define ROTARY_EN 4
 #define ROTARY_STEP 5
 #define ROTARY_DIR 6
@@ -59,6 +61,8 @@ void setup() {
   digitalWrite(LINEAR_EN, HIGH);
   pinMode(LINEAR_STEP, OUTPUT);
   pinMode(LINEAR_DIR, OUTPUT);
+  
+  pinMode(13, OUTPUT);
 
   Serial.begin(38400);
   
@@ -90,14 +94,6 @@ void timer_func() {
   }
 }
 
-int do_step(int step_pin, int dir_pin, int increment) {
-  if(increment != 0) {
-    digitalWrite(dir_pin, increment == 1);
-    digitalWrite(step_pin, HIGH);
-  }
-  return increment;
-}
-
 void do_move(int x, int y, int interval) {
   long dx = x - cur_x;
   long dy = y - cur_y;
@@ -108,11 +104,12 @@ void do_move(int x, int y, int interval) {
   
   digitalWrite(ROTARY_EN, LOW);
   digitalWrite(LINEAR_EN, LOW);
+  digitalWrite(13, HIGH);
   phase = PHASE_UP_EDGE;
   Timer1.attachInterrupt(timer_func, interval >> 1);
   
   // Interpolation counter
-  int i = 0;
+  int i = 0, j = 0;
   // Values in steps
   int target_theta = cur_theta, target_r = cur_r;
   while(i <= distance) {
@@ -121,16 +118,48 @@ void do_move(int x, int y, int interval) {
       cur_x += stepx;
       cur_y += stepy;
       target_r = sqrt(cur_x * cur_x + cur_y * cur_y);
-      target_theta = atan2(cur_y, cur_x) * RADS_TO_STEPS;
+      target_theta = (atan2(cur_y, cur_x) + M_PI) * RADS_TO_STEPS;
     }
+
     while(phase != PHASE_UP_EDGE);
-    cur_r += do_step(LINEAR_STEP, LINEAR_DIR, sign(target_r - cur_r));
-    if(abs(target_theta - cur_theta) < STEPS_PER_CIRCLE / 2) {
-      cur_theta += do_step(ROTARY_STEP, ROTARY_DIR, sign(target_theta - cur_theta));
-    } else {
-      cur_theta = (cur_theta + do_step(ROTARY_STEP, ROTARY_DIR, sign(cur_theta - target_theta))) % STEPS_PER_CIRCLE;
-      if(cur_theta < 0)
-        cur_theta += STEPS_PER_CIRCLE;
+
+#ifdef DEBUG
+    if(j % 250 == 0) {
+      Serial.print("LOG target_r = ");
+      Serial.print(target_r);
+      Serial.print(", cur_r = ");
+      Serial.print(cur_r);
+      Serial.print(", target_theta = ");
+      Serial.print(target_theta);
+      Serial.print(", cur_theta = ");
+      Serial.print(cur_theta);
+      Serial.print(", cur_x = ");
+      Serial.print(cur_x);
+      Serial.print(", cur_y = ");
+      Serial.println(cur_y);
+    }
+    j += 1;
+#endif
+
+    // Radius step
+    if(target_r != cur_r) {
+      digitalWrite(LINEAR_DIR, target_r > cur_r);
+      digitalWrite(LINEAR_STEP, HIGH);
+      cur_r += sign(target_r - cur_r);
+    }
+
+    // Rotary step
+    if(target_theta != cur_theta) {
+      if(abs(target_theta - cur_theta) < STEPS_PER_CIRCLE / 2) {
+        digitalWrite(ROTARY_DIR, target_theta > cur_theta);
+        cur_theta += sign(target_theta - cur_theta);
+      } else {
+        digitalWrite(ROTARY_DIR, target_theta < cur_theta);
+        cur_theta = (cur_theta + sign(cur_theta - target_theta)) % STEPS_PER_CIRCLE;
+        if(cur_theta < 0)
+          cur_theta += STEPS_PER_CIRCLE;
+      }
+      digitalWrite(ROTARY_STEP, HIGH);
     }
     phase = PHASE_IDLE;
   }
@@ -139,6 +168,7 @@ void do_move(int x, int y, int interval) {
   delayMicroseconds(1);
   digitalWrite(ROTARY_EN, HIGH);
   digitalWrite(LINEAR_EN, HIGH);
+  digitalWrite(13, LOW);
 }
 
 void move() {
