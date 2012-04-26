@@ -18,6 +18,8 @@
 #define LINEAR_LIMIT A1
 
 #define STEPS_PER_CIRCLE 25600
+#define MAX_RADIUS 5500
+
 #define RADS_TO_STEPS STEPS_PER_CIRCLE / (2.0 * M_PI)
 
 // All values in steps
@@ -355,6 +357,15 @@ void noop() {
   Serial.println("OK");
 }
 
+void info() {
+  char buf[64];
+  read_line(buf);
+  Serial.print("INFO ");
+  Serial.print(STEPS_PER_CIRCLE);
+  Serial.print(", ");
+  Serial.println(MAX_RADIUS);
+}
+
 struct command_t {
   char name;
   void (*func)();
@@ -364,6 +375,7 @@ struct command_t {
   {'s', speed},
   {'0', zero},
   {'n', noop},
+  {'?', info},
   {'\0', NULL}
 };
 
