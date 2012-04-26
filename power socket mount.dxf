@@ -41,6 +41,14 @@ $INSUNITS
  70
 4
   9
+$DIMSTYLE
+  2
+Standard
+  9
+$CLAYER
+  8
+0
+  9
 $DIMEXO
  40
 0.625
@@ -903,7 +911,7 @@ LAYER
 100
 AcDbSymbolTable
  70
-1
+2
   0
 LAYER
   5
@@ -924,6 +932,28 @@ AcDbLayerTableRecord
 CONTINUOUS
 370
 25
+390
+F
+  0
+LAYER
+  5
+43
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+Dimension
+ 70
+0
+ 62
+5
+420
+255
+  6
+CONTINUOUS
+370
+0
 390
 F
   0
@@ -1253,7 +1283,7 @@ ENTITIES
   0
 CIRCLE
   5
-43
+44
 100
 AcDbEntity
 100
@@ -1277,7 +1307,7 @@ ByLayer
   0
 CIRCLE
   5
-44
+45
 100
 AcDbEntity
 100
@@ -1301,7 +1331,7 @@ ByLayer
   0
 CIRCLE
   5
-45
+46
 100
 AcDbEntity
 100
@@ -1325,7 +1355,7 @@ ByLayer
   0
 LINE
   5
-46
+47
 100
 AcDbEntity
 100
@@ -1353,7 +1383,7 @@ ByLayer
   0
 LINE
   5
-47
+48
 100
 AcDbEntity
 100
@@ -1381,7 +1411,7 @@ ByLayer
   0
 LINE
   5
-48
+49
 100
 AcDbEntity
 100
@@ -1409,7 +1439,7 @@ ByLayer
   0
 ARC
   5
-49
+4A
 100
 AcDbEntity
   8
@@ -1439,7 +1469,7 @@ AcDbArc
   0
 ARC
   5
-4A
+4B
 100
 AcDbEntity
   8
@@ -1469,7 +1499,7 @@ AcDbArc
   0
 ARC
   5
-4B
+4C
 100
 AcDbEntity
   8
@@ -1496,6 +1526,370 @@ AcDbArc
 270.0
  51
 35.9999999999998792
+  0
+LINE
+  5
+4D
+100
+AcDbEntity
+100
+AcDbLine
+  8
+0
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+72.7124851260258112
+ 20
+46.951022736025827
+ 30
+0.0
+ 11
+76.0124851260258083
+ 21
+46.951022736025827
+ 31
+0.0
+  0
+LINE
+  5
+4E
+100
+AcDbEntity
+100
+AcDbLine
+  8
+0
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+76.0124851260258083
+ 20
+46.951022736025827
+ 30
+0.0
+ 11
+76.0124851260258083
+ 21
+50.2510227360258241
+ 31
+0.0
+  0
+LINE
+  5
+4F
+100
+AcDbEntity
+100
+AcDbLine
+  8
+0
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+76.0124851260258083
+ 20
+50.2510227360258241
+ 30
+0.0
+ 11
+72.7124851260258112
+ 21
+50.2510227360258241
+ 31
+0.0
+  0
+LINE
+  5
+50
+100
+AcDbEntity
+100
+AcDbLine
+  8
+0
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+72.7124851260258112
+ 20
+50.2510227360258241
+ 30
+0.0
+ 11
+72.7124851260258112
+ 21
+46.951022736025827
+ 31
+0.0
+  0
+LINE
+  5
+51
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Dimension
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+76.0124851260258083
+ 20
+46.951022736025827
+ 30
+0.0
+ 11
+76.0124851260258083
+ 21
+50.2510227360258241
+ 31
+0.0
+  0
+LINE
+  5
+52
+100
+AcDbEntity
+100
+AcDbLine
+  8
+0
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+140.0
+ 20
+30.0
+ 30
+0.0
+ 11
+143.3000000000000114
+ 21
+30.0
+ 31
+0.0
+  0
+LINE
+  5
+53
+100
+AcDbEntity
+100
+AcDbLine
+  8
+0
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+143.3000000000000114
+ 20
+30.0
+ 30
+0.0
+ 11
+143.3000000000000114
+ 21
+33.0
+ 31
+0.0
+  0
+LINE
+  5
+54
+100
+AcDbEntity
+100
+AcDbLine
+  8
+0
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+140.0
+ 20
+30.0
+ 30
+0.0
+ 11
+140.0
+ 21
+33.0
+ 31
+0.0
+  0
+LINE
+  5
+55
+100
+AcDbEntity
+100
+AcDbLine
+  8
+0
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+140.0
+ 20
+33.0
+ 30
+0.0
+ 11
+139.0
+ 21
+33.0
+ 31
+0.0
+  0
+LINE
+  5
+56
+100
+AcDbEntity
+100
+AcDbLine
+  8
+0
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+143.3000000000000114
+ 20
+33.0
+ 30
+0.0
+ 11
+144.3000000000000114
+ 21
+33.0
+ 31
+0.0
+  0
+LINE
+  5
+57
+100
+AcDbEntity
+100
+AcDbLine
+  8
+0
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+139.0
+ 20
+58.0
+ 30
+0.0
+ 11
+144.3000000000000114
+ 21
+58.0
+ 31
+0.0
+  0
+LINE
+  5
+58
+100
+AcDbEntity
+100
+AcDbLine
+  8
+0
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+139.0
+ 20
+33.0
+ 30
+0.0
+ 11
+139.0
+ 21
+58.0
+ 31
+0.0
+  0
+LINE
+  5
+59
+100
+AcDbEntity
+100
+AcDbLine
+  8
+0
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+144.3000000000000114
+ 20
+33.0
+ 30
+0.0
+ 11
+144.3000000000000114
+ 21
+58.0
+ 31
+0.0
   0
 ENDSEC
   0
@@ -1535,7 +1929,7 @@ E
   3
 AcDbVariableDictionary
 350
-4C
+5A
   0
 DICTIONARY
   5
@@ -1999,7 +2393,7 @@ Layout2
   0
 DICTIONARY
   5
-4C
+5A
 100
 AcDbDictionary
 281
@@ -2007,15 +2401,15 @@ AcDbDictionary
   3
 DIMASSOC
 350
-4E
+5C
   3
 HIDETEXT
 350
-4D
+5B
   0
 DICTIONARYVAR
   5
-4D
+5B
 100
 DictionaryVariables
 280
@@ -2025,7 +2419,7 @@ DictionaryVariables
   0
 DICTIONARYVAR
   5
-4E
+5C
 100
 DictionaryVariables
 280
