@@ -14,6 +14,7 @@ class SandPlotter(object):
     def __init__(self, socket, debug=False):
         self._socket = socket
         self._debug = debug
+        self._get_info()
 
     def _write(self, data):
         if self._debug:
@@ -35,6 +36,18 @@ class SandPlotter(object):
         if result != "OK":
             raise UnexpectedResponseError(result)
 
+    def _get_info(self):
+        self._write("?\n");
+        result = self._readline().strip()
+        result_parts = result.split(" ")
+        if len(result_parts) < 3:
+            raise UnexpectedResponseError(result)
+        status, theta_steps, max_r = result[:3]
+        if status != 'INFO':
+            raise UnexpectedResponseError(result)
+        self.steps_per_circle = int(theta_steps)
+        self.max_radius = int(max_r)
+
     def move_xy(self, x, y):
         self._write("m %d %d\n" % (x, y))
         self._read_ok()
@@ -49,4 +62,8 @@ class SandPlotter(object):
 
     def zero(self):
         self._write("0\n")
+        self._read_ok()
+
+    def noop(self):
+        self._write("n\n")
         self._read_ok()

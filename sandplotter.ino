@@ -362,7 +362,7 @@ void info() {
   read_line(buf);
   Serial.print("INFO ");
   Serial.print(STEPS_PER_CIRCLE);
-  Serial.print(", ");
+  Serial.print(" ");
   Serial.println(MAX_RADIUS);
 }
 
