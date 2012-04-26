@@ -349,6 +349,12 @@ void zero() {
   do_zero(interval);
 }
 
+void noop() {
+  char buf[64];
+  read_line(buf);
+  Serial.println("OK");
+}
+
 struct command_t {
   char name;
   void (*func)();
@@ -357,6 +363,7 @@ struct command_t {
   {'p', move_polar},
   {'s', speed},
   {'0', zero},
+  {'n', noop},
   {'\0', NULL}
 };
 
