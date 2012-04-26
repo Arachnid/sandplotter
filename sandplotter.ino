@@ -363,7 +363,11 @@ void info() {
   Serial.print("INFO ");
   Serial.print(STEPS_PER_CIRCLE);
   Serial.print(" ");
-  Serial.println(MAX_RADIUS);
+  Serial.print(MAX_RADIUS);
+  Serial.print(" ");
+  Serial.print(cur_theta);
+  Serial.print(" ");
+  Serial.print(cur_r);
 }
 
 struct command_t {
