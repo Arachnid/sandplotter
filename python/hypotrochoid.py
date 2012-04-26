@@ -18,7 +18,7 @@ def generate_hypotrochoid(p, q, radius, steps_per_rad=10):
     period = 2 * math.pi * p
     scale = radius / (a + 2 * b)
     
-    for i in range(1, int(period * steps_per_rad)):
+    for i in range(1, int(period * steps_per_rad) + 1):
         t = float(i) / steps_per_rad
         x = (a + b) * math.cos(t) + b * math.cos((a + b) / b * t)
         y = (a + b) * math.sin(t) + b * math.sin((a + b) / b * t)
