@@ -46,6 +46,7 @@ class SandPlotter(object):
         if status != 'INFO':
             raise UnexpectedResponseError(result)
         self.steps_per_circle = int(theta_steps)
+        self.steps_per_radian = self.steps_per_circle / (math.pi * 2)
         self.max_radius = int(max_r)
 
     def move_xy(self, x, y):
@@ -53,6 +54,7 @@ class SandPlotter(object):
         self._read_ok()
 
     def move_polar(self, r, theta):
+        r = r * self.steps_per_radian
         self._write("p %d %d\n" % (r, theta))
         self._read_ok()
 
