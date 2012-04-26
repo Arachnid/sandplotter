@@ -39,6 +39,14 @@ class SandPlotter(object):
         self._write("m %d %d\n" % (x, y))
         self._read_ok()
 
+    def move_polar(self, r, theta):
+        self._write("p %d %d\n" % (r, theta))
+        self._read_ok()
+
     def set_speed(self, speed):
         self._write("s %d\n" % (speed,))
+        self._read_ok()
+
+    def zero(self):
+        self._write("0\n")
         self._read_ok()
