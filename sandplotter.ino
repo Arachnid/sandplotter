@@ -6,7 +6,7 @@
 #define sign(x) ((x > 0) - (x < 0))
 #define MAX(x, y) ((x) < (y) ? (y) : (x))
 
-// #define DEBUG
+#define DEBUG
 
 #define ROTARY_EN 4
 #define ROTARY_STEP 5
@@ -211,8 +211,8 @@ void do_move_xy(int x, int y, int interval) {
 #endif
 }
 
-void do_move_polar(int dr, int dtheta, int interval) {
-  int distance = abs(MAX(dr, dtheta));
+void do_move_polar(long dr, long dtheta, int interval) {
+  long distance = abs(MAX(dr, dtheta));
   float deltar = float(dr) / distance;
   float deltatheta = float(dtheta) / distance;
   float t = 0.0;
@@ -245,7 +245,12 @@ void do_move_polar(int dr, int dtheta, int interval) {
       }
       t += stepsize;
       target_r += deltar * stepsize;
-      target_theta += deltatheta * stepsize;
+      target_theta = (target_theta + (deltatheta * stepsize));
+      if(target_theta > STEPS_PER_CIRCLE) {
+        target_theta -= STEPS_PER_CIRCLE;
+      } else if(target_theta < 0) {
+        target_theta += STEPS_PER_CIRCLE;
+      }
     }
     
     while(phase != PHASE_UP_EDGE);
@@ -271,14 +276,18 @@ void do_move_polar(int dr, int dtheta, int interval) {
   }
   
   disable_steppers();
-  cur_x = sin(cur_theta / RADS_TO_STEPS) * cur_r;
-  cur_y = cos(cur_theta / RADS_TO_STEPS) * cur_r;
+  cur_x = cos(cur_theta / RADS_TO_STEPS) * cur_r;
+  cur_y = sin(cur_theta / RADS_TO_STEPS) * cur_r;
 
 #ifdef DEBUG
   Serial.print("LOG Final r = ");
   Serial.print(cur_r);
   Serial.print(", theta = ");
-  Serial.println(cur_theta);
+  Serial.print(cur_theta);
+  Serial.print(", x = ");
+  Serial.print(cur_x);
+  Serial.print(", y = ");
+  Serial.println(cur_y);
 #endif
 }
 
@@ -323,14 +332,14 @@ void move_xy() {
   char buf[64];
   int x, y;
   read_line(buf);
-  sscanf(buf, "%ld %ld", &x, &y);
+  sscanf(buf, "%d %d", &x, &y);
   Serial.println("OK");
   do_move_xy(x, y, interval);
 }
 
 void move_polar() {
   char buf[64];
-  int r, theta;
+  long r, theta;
   read_line(buf);
   sscanf(buf, "%ld %ld", &r, &theta);
   Serial.println("OK");
@@ -367,7 +376,7 @@ void info() {
   Serial.print(" ");
   Serial.print(cur_theta);
   Serial.print(" ");
-  Serial.print(cur_r);
+  Serial.println(cur_r);
 }
 
 struct command_t {
