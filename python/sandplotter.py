@@ -1,4 +1,5 @@
 import logging
+import math
 
 class Error(Exception): pass
 
@@ -37,12 +38,12 @@ class SandPlotter(object):
             raise UnexpectedResponseError(result)
 
     def _get_info(self):
-        self._write("?\n");
+        self._write("? \n");
         result = self._readline().strip()
         result_parts = result.split(" ")
         if len(result_parts) < 5:
             raise UnexpectedResponseError(result)
-        status, theta_steps, max_r, theta, r = result[:3]
+        status, theta_steps, max_r, theta, r = result_parts[:5]
         if status != 'INFO':
             raise UnexpectedResponseError(result)
         self.steps_per_circle = int(theta_steps)
@@ -73,9 +74,9 @@ class SandPlotter(object):
         self._read_ok()
 
     def zero(self):
-        self._write("0\n")
+        self._write("0 \n")
         self._read_ok()
 
     def noop(self):
-        self._write("n\n")
+        self._write("n \n")
         self._read_ok()

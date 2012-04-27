@@ -6,7 +6,7 @@
 #define sign(x) ((x > 0) - (x < 0))
 #define MAX(x, y) ((x) < (y) ? (y) : (x))
 
-#define DEBUG
+// #define DEBUG
 
 #define ROTARY_EN 4
 #define ROTARY_STEP 5
