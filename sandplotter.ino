@@ -20,7 +20,9 @@
 #define STEPS_PER_CIRCLE 25600
 #define MAX_RADIUS 5500
 
-#define RADS_TO_STEPS STEPS_PER_CIRCLE / (2.0 * M_PI)
+#define CENTER_THRESHOLD 100
+
+#define RADS_TO_STEPS (STEPS_PER_CIRCLE / (2.0 * M_PI))
 
 // All values in steps
 int cur_theta, cur_r, cur_x, cur_y;
@@ -172,7 +174,11 @@ void do_move_xy(int x, int y, int interval) {
       fcur_x += stepx;
       fcur_y += stepy;
       target_r = sqrt(fcur_x * fcur_x + fcur_y * fcur_y);
-      target_theta = (atan2(fcur_y, fcur_x) + M_PI) * RADS_TO_STEPS;
+      if(target_r < CENTER_THRESHOLD) {
+        target_theta = cur_theta;
+      } else {
+        target_theta = (atan2(fcur_y, fcur_x) + M_PI) * RADS_TO_STEPS;
+      }
     }
 
     while(phase != PHASE_UP_EDGE);
@@ -212,7 +218,7 @@ void do_move_xy(int x, int y, int interval) {
 }
 
 void do_move_polar(long dr, long dtheta, int interval) {
-  long distance = abs(MAX(dr, dtheta));
+  long distance = MAX(abs(dr), abs(dtheta));
   float deltar = float(dr) / distance;
   float deltatheta = float(dtheta) / distance;
   float t = 0.0;
@@ -276,8 +282,8 @@ void do_move_polar(long dr, long dtheta, int interval) {
   }
   
   disable_steppers();
-  cur_x = cos(cur_theta / RADS_TO_STEPS) * cur_r;
-  cur_y = sin(cur_theta / RADS_TO_STEPS) * cur_r;
+  cur_x = cos(cur_theta / RADS_TO_STEPS - M_PI) * cur_r;
+  cur_y = sin(cur_theta / RADS_TO_STEPS - M_PI) * cur_r;
 
 #ifdef DEBUG
   Serial.print("LOG Final r = ");
