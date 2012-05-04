@@ -1,0 +1,12 @@
+application: sandplotter
+runtime: python27
+version: main
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /.*
+  script: main.app
+
+builtins:
+-  remote_api: on

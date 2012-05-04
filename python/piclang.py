@@ -19,7 +19,7 @@ this program, time always proceeds from 0 to 1.
 ## Primitive curves ##
 
 `circle` traces out the unit circle once during this time, starting
-and ending at (1, 0).
+and ending at (0, 1).  XXX we should probably fix that.
 
 `line` traces out a line from (0, 0) to (1, 1).
 
@@ -66,12 +66,12 @@ circle`.
 scale the other.  (Again, it’s commutative, so you can think of either
 curve as providing the rotation and scale for the other.)  Rotating a
 curve by the unit circle `circle` will cause it to rotate one full
-revolution, starting and ending with no rotation, while being scaled
-by 1 (that is, not scaled).  For example, `rotate(circle, line)`
-rotates the line one full revolution as it goes from 0 to 1, producing
-a rotated version of the same spiral as `circle * line`.  If you
-remember elementary school, `rotate` is just multiplication of complex
-numbers.  As such, it’s also associative, and distributes over `+`.
+revolution while being scaled by 1 (that is, not scaled).  For
+example, `rotate(circle, line)` rotates the line one full revolution
+as it goes from 0 to 1, producing a rotated version of the same spiral
+as `circle * line`.  If you remember elementary school, `rotate` is
+just multiplication of complex numbers.  As such, it’s also
+associative, and distributes over `+`.
 
 With `rotate`, `+`, `*`, `circle`, and constants, you can get an
 ellipse of any shape and orientation at any location.  Using `*`, `+`,
@@ -134,7 +134,11 @@ formula.
 
 import math
 import numbers
-from PIL import Image, ImageDraw
+import readline
+try:
+  from PIL import Image, ImageDraw
+except ImportError:
+  import Image, ImageDraw
 
 class Curve(object):
   @classmethod
@@ -239,7 +243,7 @@ class step(Curve):
 @FunctionCurve
 def circle(t):
   theta = 2 * math.pi * t
-  return (math.cos(theta), math.sin(theta))
+  return (math.sin(theta), math.cos(theta))
 
 
 @FunctionCurve
