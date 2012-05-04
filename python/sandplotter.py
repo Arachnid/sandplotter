@@ -69,6 +69,10 @@ class SandPlotter(object):
         self.radius += radius
         self._theta = (self._theta + step_theta) % self.steps_per_circle
 
+    def plot(self, points):
+        for point in points:
+            self.move_xy(*point)
+
     def set_speed(self, speed):
         self._write("s %d\n" % (speed,))
         self._read_ok()
