@@ -132,6 +132,7 @@ formula.
 
 """
 
+import inspect
 import math
 import numbers
 import readline
@@ -265,6 +266,47 @@ def render(f, points=1000):
     draw = ImageDraw.Draw(im)
     draw.line(interpolate(f * (size/2) + size/2, points), fill=(255,255,255))
     im.show()
+
+class PicStack(object):
+    def __init__(self):
+        self._stack = []
+        self._stackptr = 0 # Points to the first index that's not in the stack
+    
+    def _popone(self):
+        if not self._stack:
+            return 0
+        self._stackptr -= 1
+        if self._stackptr < 0:
+            self._stackptr = min(len(self._stack), 8) - 1
+        return self._stack[self._stackptr]
+    
+    def pop(self, num=1):
+        return [self._popone() for i in range(num)]
+
+    def push(self, elt):
+        if self._stackptr < len(self._stack):
+            self._stack[self._stackptr] = elt
+        else:
+            self._stack.append(elt)
+        self._stackptr += 1
+
+
+def stackparse(expr):
+    """Parses a stack-based representation of a curve expression, returning the expression tree."""
+    stack = PicStack()
+    for token in expr:
+        if token is circle or token is line:
+            stack.push(token)
+        elif isinstance(token, (int, float, tuple)):
+            stack.push(token)
+        elif callable(token):
+            if inspect.isclass(token):
+                argcount = len(inspect.getargspec(token.__init__)[0]) - 1
+            else:
+                argcount = len(inspect.getargspec(token)[0])
+            stack.push(token(*stack.pop(argcount)))
+    return stack.pop()[0]
+
 
 repl_doc = """
 Available primitives are circle, line, reverse, concat, boustro,
