@@ -5,8 +5,8 @@ api_version: 1
 threadsafe: true
 
 handlers:
-- url: /.*
-  script: main.app
+- url: /random
+  script: randomcurve.app
 
 builtins:
 -  remote_api: on
