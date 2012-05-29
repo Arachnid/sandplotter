@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Individual #{{individual.key.id()}}{% endblock %}
+{% block body %}
+<h2>Individual #{{individual.key.id()}}</h2>
+<img src="{{individual.image_url}}" />
+<table>
+    <tr><th>Generation</th><td>{{individual.generation}}</td></tr>
+    <tr><th>Parents</th><td>
+        {% for parent_key in individual.parents %}
+            <a href="/individual/{{parent_key.id()}}">#{{parent_key.id()}}</a>
+        {% endfor %}
+    </td></tr>
+    <tr><th>Matches</th><td>{{individual.matches}}</td></tr>
+    <tr><th>Score</th><td>{{individual.fitness}}</td></tr>
+</table>
+{% endblock %}

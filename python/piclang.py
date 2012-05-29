@@ -135,7 +135,10 @@ formula.
 import inspect
 import math
 import numbers
-import readline
+try:
+    import readline
+except ImportError:
+    pass
 try:
     from PIL import Image, ImageDraw
 except ImportError:
@@ -302,16 +305,24 @@ class step(Curve):
             l = "(%s)" % l
         return "%s // %r" % (l, self.steps)
 
-@FunctionCurve
-def circle(t):
-    theta = 2 * math.pi * t
-    return (math.sin(theta), math.cos(theta))
+class PlatonicCircle(Curve):
+    def __call__(self, t):
+        theta = 2 * math.pi * t
+        return (math.sin(theta), math.cos(theta))
 
+    def __repr__(self):
+        return "circle"
 
-@FunctionCurve
-def line(t):
-    return (t, t)
+circle = PlatonicCircle()
 
+class PlatonicLine(Curve):
+    def __call__(self, t):
+        return (t, t)
+
+    def __repr__(self):
+        return "line"
+
+line = PlatonicLine()
 
 def boustro(func, times):
     return repeat(concat(func, reverse(func)), times * 0.5)
@@ -345,7 +356,7 @@ def render(f, points=1000, size=800, penwidth=6, gapwidth=6, bgcolor=(0, 0, 0), 
     for src, dest in zip(point_list, point_list[1:]):
         draw.line((src, dest), fill=bgcolor, width=penwidth+gapwidth*2)
         draw.line((src, dest), fill=fgcolor, width=penwidth)
-    im.show()
+    return im
 
 class PicStack(object):
     def __init__(self):
@@ -377,7 +388,7 @@ def stackparse(expr):
     """Parses a stack-based representation of a curve expression, returning the expression tree."""
     stack = PicStack()
     for token in expr:
-        if token is circle or token is line:
+        if isinstance(token, (PlatonicCircle, PlatonicLine)):
             stack.push(token)
         elif isinstance(token, (int, float, tuple)):
             stack.push(token)

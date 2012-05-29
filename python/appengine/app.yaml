@@ -7,6 +7,19 @@ threadsafe: true
 handlers:
 - url: /random
   script: randomcurve.app
+- url: /.*
+  script: main.app
 
 builtins:
 -  remote_api: on
+-  deferred: on
+
+libraries:
+- name: PIL
+  version: "1.1.7"
+- name: jinja2
+  version: "2.6"
+- name: webapp2
+  version: "2.3"
+- name: webob
+  version: "1.1.1"
