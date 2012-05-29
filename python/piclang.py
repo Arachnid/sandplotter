@@ -137,119 +137,167 @@ import math
 import numbers
 import readline
 try:
-  from PIL import Image, ImageDraw
+    from PIL import Image, ImageDraw
 except ImportError:
-  import Image, ImageDraw
+    import Image, ImageDraw
 
 class Curve(object):
-  @classmethod
-  def wrap(cls, o):
-    if isinstance(o, Curve):
-      return o
-    if callable(o):
-      return FunctionCurve(o)
-    if isinstance(o, numbers.Number):
-      return cls.wrap((o, o))
-    if isinstance(o, tuple) and len(o) == 2:
-      return constant(o)
-    raise TypeError("Expected function, number, or 2-tuple, got %r, a %r" % (o, type(o)))
+    @classmethod
+    def wrap(cls, o):
+        if isinstance(o, Curve):
+            return o
+        if callable(o):
+            return FunctionCurve(o)
+        if isinstance(o, numbers.Number):
+            return cls.wrap((o, o))
+        if isinstance(o, tuple) and len(o) == 2:
+            return constant(o)
+        raise TypeError("Expected function, number, or 2-tuple, got %r, a %r" % (o, type(o)))
 
-  def __add__(self, other):
-    return translate(self, other)
+    def __add__(self, other):
+        return translate(self, other)
 
-  def __mul__(self, other):
-    return scale(self, other)
+    def __mul__(self, other):
+        return scale(self, other)
 
-  def __pow__(self, times):
-    return repeat(self, times)
+    def __pow__(self, times):
+        return repeat(self, times)
 
-  def __floordiv__(self, steps):
-    return step(self, steps)
+    def __floordiv__(self, steps):
+        return step(self, steps)
 
 
 class FunctionCurve(Curve):
-  def __init__(self, func):
-    self.func = func
+    def __init__(self, func):
+        self.func = func
 
-  def __call__(self, t):
-    return self.func(t)
+    def __call__(self, t):
+        return self.func(t)
+
+    def __repr__(self):
+        return self.func.__name__
 
 
 class TwoArgCurve(Curve):
-  def __init__(self, a, b):
-    self.a = Curve.wrap(a)
-    self.b = Curve.wrap(b)
+    PRECEDENCE = None
+    OPERATOR = None
 
-  def __call__(self, t):
-    return self.invoke(self.a(t), self.b(t))
+    def __init__(self, a, b):
+        self.a = Curve.wrap(a)
+        self.b = Curve.wrap(b)
 
-  
-def constant(val):
-  return FunctionCurve(lambda t: val)
+    def __call__(self, t):
+        return self.invoke(self.a(t), self.b(t))
+
+    def __repr__(self):
+        l = repr(self.a)
+        r = repr(self.b)
+        if self.OPERATOR:
+            if getattr(self.a, 'PRECEDENCE', None) > self.PRECEDENCE:
+                l = "(%s)" % l
+            if getattr(self.b, 'PRECEDENCE', None) >= self.PRECEDENCE:
+                r = "(%s)" % r
+            return " ".join((l, self.OPERATOR, r))
+        else:
+            return "%s(%s, %s)" % (self.__name__, l, r)
+
+
+class Constant(Curve):
+    def __init__(self, val):
+        self.val = val
+
+    def __call__(self, t):
+        return self.val
+
+    def __repr__(self):
+        return repr(self.val)
 
 
 class translate(TwoArgCurve):
-  def invoke(self, (ax, ay), (bx, by)):
-    return (ax + bx, ay + by)
+    OPERATOR = "+"
+    PRECEDENCE = 10
+
+    def invoke(self, (ax, ay), (bx, by)):
+        return (ax + bx, ay + by)
 
 
 class scale(TwoArgCurve):
-  def invoke(self, (ax, ay), (bx, by)):
-    return (ax * bx, ay * by)
+    OPERATOR = "*"
+    PRECEDENCE = 9
+
+    def invoke(self, (ax, ay), (bx, by)):
+        return (ax * bx, ay * by)
 
 
 class rotate(TwoArgCurve):
-  def invoke(self, (ax, ay), (bx, by)):
-    return (ax * bx - ay * by, ay * bx + ax * by)
+    def invoke(self, (ax, ay), (bx, by)):
+        return (ax * bx - ay * by, ay * bx + ax * by)
 
 
 class reverse(Curve):
-  def __init__(self, func):
-    self.func = func
+    def __init__(self, func):
+        self.func = func
 
-  def __call__(self, t):
-    return self.func(1 - t)
+    def __call__(self, t):
+        return self.func(1 - t)
+
+    def __repr__(self):
+        return "reverse(%r)" % (self.func,)
 
 
 class concat(Curve):
-  def __init__(self, a, b):
-    self.a = Curve.wrap(a)
-    self.b = Curve.wrap(b)
+    def __init__(self, a, b):
+        self.a = Curve.wrap(a)
+        self.b = Curve.wrap(b)
 
-  def __call__(self, t):
-    if t < 0.5:
-      return self.a(t * 2)
-    else:
-      return self.b(t * 2 - 1)
+    def __call__(self, t):
+        if t < 0.5:
+            return self.a(t * 2)
+        else:
+            return self.b(t * 2 - 1)
+
+    def __repr__(self):
+        return "concat(%r, %r)" % (self.a, self.b)
 
 
 class repeat(Curve):
-  def __init__(self, func, times):
-    self.func = func
-    self.times = times
+    def __init__(self, func, times):
+        self.func = func
+        self.times = times
 
-  def __call__(self, t):
-    return self.func((t * self.times) % 1)
+    def __call__(self, t):
+        return self.func((t * self.times) % 1)
+
+    def __repr__(self):
+        l = repr(self.func)
+        if getattr(self.func, 'PRECEDENCE', 0) > 0:
+            l = "(%s)" % l
+        return "%s ** %r" % (l, self.times)
 
 
 class step(Curve):
-  def __init__(self, func, steps):
-    self.func =func
-    self.steps = steps
+    def __init__(self, func, steps):
+        self.func =func
+        self.steps = steps
 
-  def __call__(self, t):
-    return self.func(math.floor(t * self.steps) / self.steps)
+    def __call__(self, t):
+        return self.func(math.floor(t * self.steps) / self.steps)
 
+    def __repr__(self):
+        l = repr(self.func)
+        if getattr(self.func, 'PRECEDENCE', 0) > 0:
+            l = "(%s)" % l
+        return "%s // %r" % (l, self.steps)
 
 @FunctionCurve
 def circle(t):
-  theta = 2 * math.pi * t
-  return (math.sin(theta), math.cos(theta))
+    theta = 2 * math.pi * t
+    return (math.sin(theta), math.cos(theta))
 
 
 @FunctionCurve
 def line(t):
-  return (t, t)
+    return (t, t)
 
 
 def boustro(func, times):
