@@ -211,7 +211,7 @@ class TwoArgCurve(Curve):
                 r = "(%s)" % r
             return " ".join((l, self.OPERATOR, r))
         else:
-            return "%s(%s, %s)" % (self.__name__, l, r)
+            return "%s(%s, %s)" % (type(self).__name__, l, r)
 
 
 class constant(Curve):
@@ -248,7 +248,7 @@ class rotate(TwoArgCurve):
 
 class reverse(Curve):
     def __init__(self, func):
-        self.func = func
+        self.func = Curve.wrap(func)
 
     def __call__(self, t):
         return self.func(1 - t)
@@ -289,8 +289,8 @@ class repeat(Curve):
 
 class step(Curve):
     def __init__(self, func, steps):
-        self.func = func
-        self.steps = steps
+        self.func = Curve.wrap(func)
+        self.steps = Curve.wrap(steps)
 
     def __call__(self, t):
         steps = self.steps(t)[0]
@@ -314,7 +314,7 @@ def line(t):
 
 
 def boustro(func, times):
-    return repeat(concat(func, reverse(func)), times/2.0)
+    return repeat(concat(func, reverse(func)), times * 0.5)
 
 
 def interpolate(f, points):
@@ -361,7 +361,9 @@ class PicStack(object):
         return self._stack[self._stackptr]
     
     def pop(self, num=1):
-        return [self._popone() for i in range(num)]
+        ret = [self._popone() for i in range(num)]
+        ret.reverse()
+        return ret
 
     def push(self, elt):
         if self._stackptr < len(self._stack):
