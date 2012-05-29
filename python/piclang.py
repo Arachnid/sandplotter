@@ -157,14 +157,26 @@ class Curve(object):
     def __add__(self, other):
         return translate(self, other)
 
+    def __radd__(self, other):
+        return translate(other, self)
+
     def __mul__(self, other):
         return scale(self, other)
+
+    def __rmul__(self, other):
+        return scale(other, self)
 
     def __pow__(self, times):
         return repeat(self, times)
 
+    def __rpow__(self, times):
+        return repeat(times, self)
+
     def __floordiv__(self, steps):
         return step(self, steps)
+
+    def __rfloordiv__(self, steps):
+        return step(steps, self)
 
 
 class FunctionCurve(Curve):
@@ -262,11 +274,11 @@ class concat(Curve):
 
 class repeat(Curve):
     def __init__(self, func, times):
-        self.func = func
-        self.times = times
+        self.func = Curve.wrap(func)
+        self.times = Curve.wrap(times)
 
     def __call__(self, t):
-        return self.func((t * self.times) % 1)
+        return self.func((t * self.times(t)[0]) % 1)
 
     def __repr__(self):
         l = repr(self.func)
@@ -277,11 +289,12 @@ class repeat(Curve):
 
 class step(Curve):
     def __init__(self, func, steps):
-        self.func =func
+        self.func = func
         self.steps = steps
 
     def __call__(self, t):
-        return self.func(math.floor(t * self.steps) / self.steps)
+        steps = self.steps(t)[0]
+        return self.func(math.floor(t * steps) / steps)
 
     def __repr__(self):
         l = repr(self.func)
@@ -311,11 +324,17 @@ def normalize(pts, w, h):
     """Scales the list of points to fit in a rectangle (0, 0) - (w, h)"""
     xmin = min(p[0] for p in pts)
     xmax = max(p[0] for p in pts)
-    xscale = (w / (xmax - xmin))
+    if xmax - xmin > 0:
+      xscale = (w / (xmax - xmin))
+    else:
+      xscale = 1
     
     ymin = min(p[1] for p in pts)
     ymax = max(p[1] for p in pts)
-    yscale = (h / (ymax - ymin))
+    if ymax - ymin > 0:
+        yscale = (h / (ymax - ymin))
+    else:
+        yscale = 1
     
     return [((x - xmin) * xscale, (y - ymin) * yscale) for x, y in pts]
 
