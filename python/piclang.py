@@ -307,11 +307,22 @@ def boustro(func, times):
 def interpolate(f, points):
     return [f(x/float(points)) for x in range(points)]
 
+def normalize(pts, w, h):
+    """Scales the list of points to fit in a rectangle (0, 0) - (w, h)"""
+    xmin = min(p[0] for p in pts)
+    xmax = max(p[0] for p in pts)
+    xscale = (w / (xmax - xmin))
+    
+    ymin = min(p[1] for p in pts)
+    ymax = max(p[1] for p in pts)
+    yscale = (h / (ymax - ymin))
+    
+    return [((x - xmin) * xscale, (y - ymin) * yscale) for x, y in pts]
 
 def render(f, points=1000, size=800, penwidth=6, gapwidth=6, bgcolor=(0, 0, 0), fgcolor=(255, 255, 255)):
     im = Image.new("RGB", (size, size), bgcolor)
     draw = ImageDraw.Draw(im)
-    point_list = interpolate(f * (size / 2) + size / 2, points)
+    point_list = normalize(interpolate(f, points), size, size)
     for src, dest in zip(point_list, point_list[1:]):
         draw.line((src, dest), fill=bgcolor, width=penwidth+gapwidth*2)
         draw.line((src, dest), fill=fgcolor, width=penwidth)
