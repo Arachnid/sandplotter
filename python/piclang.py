@@ -308,14 +308,13 @@ def interpolate(f, points):
     return [f(x/float(points)) for x in range(points)]
 
 
-def render(f, points=1000, penwidth=6, gapwidth=6):
-    size = 800
-    im = Image.new("RGB", (size, size))
+def render(f, points=1000, size=800, penwidth=6, gapwidth=6, bgcolor=(0, 0, 0), fgcolor=(255, 255, 255)):
+    im = Image.new("RGB", (size, size), bgcolor)
     draw = ImageDraw.Draw(im)
     point_list = interpolate(f * (size / 2) + size / 2, points)
     for src, dest in zip(point_list, point_list[1:]):
-        draw.line((src, dest), fill=(0, 0, 0), width=penwidth+gapwidth*2)
-        draw.line((src, dest), fill=(255, 255, 255), width=penwidth)
+        draw.line((src, dest), fill=bgcolor, width=penwidth+gapwidth*2)
+        draw.line((src, dest), fill=fgcolor, width=penwidth)
     im.show()
 
 class PicStack(object):
