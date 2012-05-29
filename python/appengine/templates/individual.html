@@ -4,6 +4,7 @@
 <h2>Individual #{{individual.key.id()}}</h2>
 <img src="{{individual.image_url}}" />
 <table>
+    <tr><th>Genome</th><td>{{genome}}</td></tr>
     <tr><th>Generation</th><td>{{individual.generation}}</td></tr>
     <tr><th>Parents</th><td>
         {% for parent_key in individual.parents %}

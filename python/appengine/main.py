@@ -2,6 +2,7 @@ import webapp2
 from google.appengine.ext import ndb
 from webapp2_extras import jinja2
 
+import piclang
 import model
 
 class BaseHandler(webapp2.RequestHandler):
@@ -16,7 +17,17 @@ class BaseHandler(webapp2.RequestHandler):
 class IndividualHandler(BaseHandler):
   def get(self, id):
     individual = model.Individual.get_by_id(int(id))
-    self.render_template('individual.html', individual=individual)
+    if not individual:
+        self.error(404)
+        return
+    genome = []
+    for instruction in individual.genome:
+        if isinstance(instruction, type) and issubclass(instruction, piclang.Curve):
+            genome.append(instruction.__name__)
+        else:
+            genome.append(repr(instruction))
+    genome = ' '.join(genome)
+    self.render_template('individual.html', individual=individual, genome=genome)
 
 
 app = webapp2.WSGIApplication([
