@@ -38,10 +38,6 @@ class Individual(ndb.Model):
             individual.put()
         return individual
 
-    @classmethod
-    def get_random(self, generation):
-        return Individual.query(Individual.generation==generation, Individual.random > random.random()).get()
-
     @property
     def image_url(self):
         return images.get_serving_url(self.image)

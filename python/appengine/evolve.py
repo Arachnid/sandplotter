@@ -96,6 +96,7 @@ def new_generation(next_generation_id, num_individuals):
     generation = model.Generation(id=next_generation_id, number=next_generation_id, num_individuals=len(nextgen))
     nextgen.append(generation)
     ndb.put_multi(nextgen)
+    memcache.set('current_Generation', next_generation_id)
 
 
 def next_generation():

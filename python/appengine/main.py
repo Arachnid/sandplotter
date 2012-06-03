@@ -1,5 +1,8 @@
 import logging
+import random
+import threading
 import webapp2
+from google.appengine.api import memcache
 from google.appengine.ext.deferred import defer
 from google.appengine.ext import ndb
 from webapp2_extras import jinja2
@@ -7,6 +10,22 @@ from webapp2_extras import jinja2
 import evolve
 import piclang
 import model
+
+organism_generation = None
+all_organisms = None
+organisms_lock = threading.Lock()
+
+def get_random_organisms(generation, num=1):
+    global organism_generation, all_organisms
+
+    if organism_generation is None or generation != organism_generation:
+        
+        with organisms_lock:
+            organism_generation = generation
+            all_organisms = model.Individual.query(model.Individual.generation == generation).fetch()
+    
+    return random.sample(all_organisms, num)
+
 
 class BaseHandler(webapp2.RequestHandler):
     @webapp2.cached_property
@@ -44,20 +63,18 @@ class IndividualHandler(BaseHandler):
 
 class HomepageHandler(BaseHandler):
     def get(self):
-        last_generation = model.Generation.query().order(-model.Generation.number).get().number
-
+        generation = memcache.get('current_generation')
+        if not generation:
+            generation = model.Generation.query().order(-model.Generation.number).get().number
+            memcache.set('current_generation', generation)
+        
         winner = int(self.request.GET.get('winner', 0))
         loser = int(self.request.GET.get('loser', 0))
         if winner and loser:
-            model.Vote.record(ndb.Key(model.Individual, loser), ndb.Key(model.Individual, winner), last_generation)
+            model.Vote.record(ndb.Key(model.Individual, loser), ndb.Key(model.Individual, winner), generation)
         
-        i1 = None
-        while i1 is None:
-            i1 = model.Individual.get_random(last_generation)
-        i2 = None
-        while i2 is None or i2.key == i1.key:
-            i2 = model.Individual.get_random(last_generation)
-        self.render_template('index.html', generation=last_generation, i1=i1, i2=i2, winner=winner)
+        i1, i2 = get_random_organisms(generation, 2)
+        self.render_template('index.html', generation=generation, i1=i1, i2=i2, winner=winner)
 
 
 class CronNextGenHandler(webapp2.RequestHandler):
