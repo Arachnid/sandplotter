@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block body %}
+    <h1>Rate my curve, generation {{generation}}</h1>
+    {% if winner %}
+        <p>Thanks! You voted for <a href="/individual/{{winner}}">#{{winner}}</a>.</p>
+    {% endif %}
+
+    <p>Which looks better to you?</p>
+    
+    <table>
+      <tr>
+        <td><a href="/?winner={{i1.key.id()}}&loser={{i2.key.id()}}"><img src="{{i1.image_url}}"/></a>
+        <td><a href="/?winner={{i2.key.id()}}&loser={{i1.key.id()}}"><img src="{{i2.image_url}}"/></a>
+      </tr>
+    </table>
+    <a href="/">Just give me another</a>
+{% endblock %}

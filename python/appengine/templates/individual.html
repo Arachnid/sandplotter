@@ -4,13 +4,25 @@
 <h2>Individual #{{individual.key.id()}}</h2>
 <img src="{{individual.image_url}}" />
 <table>
+    <tr><th>Genome</th><td>{{genome}}</td></tr>
+    <tr><th>Expression</th><td>{{expression}}</td></tr>
     <tr><th>Generation</th><td>{{individual.generation}}</td></tr>
-    <tr><th>Parents</th><td>
-        {% for parent_key in individual.parents %}
-            <a href="/individual/{{parent_key.id()}}">#{{parent_key.id()}}</a>
-        {% endfor %}
-    </td></tr>
+    {% if individual.parents %}
+        <tr><th>Parents</th><td>
+            {% for parent_key in individual.parents %}
+                <a href="/individual/{{parent_key.id()}}">#{{parent_key.id()}}</a>
+            {% endfor %}
+        </td></tr>
+    {% endif %}
+    {% if children %}
+        <tr><th>Children</th><td>
+            {% for child_key in children %}
+                <a href="/individual/{{child_key.id()}}">#{{child_key.id()}}</a>
+            {% endfor %}
+        </td></tr>
+    {% endif %}
     <tr><th>Matches</th><td>{{individual.matches}}</td></tr>
-    <tr><th>Score</th><td>{{individual.fitness}}</td></tr>
+    <tr><th>Rank</th><td>{{individual.rank}}</td></tr>
+    <tr><th>Score</th><td>{{individual.score}}</td></tr>
 </table>
 {% endblock %}
