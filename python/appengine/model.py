@@ -41,6 +41,9 @@ class Individual(ndb.Model):
     def image_url(self, size=None):
         return images.get_serving_url(self.image, size=size)
 
+    def as_dict(self, size=None):
+        return {'id': self.key.id(), 'image': self.image_url(size)}
+
 
 class Vote(ndb.Model):
     loser = ndb.KeyProperty(kind=Individual, required=True)

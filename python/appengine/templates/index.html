@@ -1,17 +1,79 @@
 {% extends "base.html" %}
-{% block body %}
-    <h1>Rate my curve, generation {{generation}}</h1>
-    {% if winner %}
-        <p>Thanks! You voted for <a href="/individual/{{winner}}">#{{winner}}</a>.</p>
-    {% endif %}
+{% block head %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var auth_token = undefined;
+            
+            function create_matchup_image(individual, other) {
+                var a = $("<a>");
+                a.append($("<img>").attr('src', individual.image).width(512).height(512));
+                a.click(function() {
+                    next_matchup(individual, other)
+                });
+                return a;
+            }
+            
+            function next_matchup(winner, loser) {
+                var args = {};
+                if(winner != undefined) {
+                    args['winner'] = winner.id;
+                    args['loser'] = loser.id;
+                    args['auth_token'] = auth_token;
 
-    <p>Which looks better to you?</p>
+                    var history = $("#history");
+                    if(history.children().size() >= 10) {
+                        history.children().first().remove();
+                    }
+                    var history_link = $("<a>");
+                    history_link.append($("<img>").attr('src', winner.image).width(64).height(64));
+                    history_link.attr("href", "/individual/" + winner.id);
+                    history_link.attr("target", "_blank");
+                    history.append(history_link);
+                    
+                    $("#historyrow").show();
+                }
+                $.post('/matchup', args, function(data) {
+                    $("#generation").text("Generation " + data.generation)
+                    var i1_box = $("#i1");
+                    i1_box.children().empty();
+                    i1_box.append(create_matchup_image(data.i1, data.i2));
+                    
+                    var i2_box = $("#i2");
+                    i2_box.children().empty();
+                    i2_box.append(create_matchup_image(data.i2, data.i1));
+                    
+                    auth_token = data.auth_token;
+                }, "json");
+            }
+
+            $("#skip").click(function() {
+                next_matchup();
+            });
+            
+            $("#historyrow").hide();
+            next_matchup();
+        });
+    </script>
+{% endblock %}
+{% block body %}
+    <p>Click on the curve that you like best.</p>
     
-    <table>
-      <tr>
-        <td><a href="/?winner={{i1.key.id()}}&loser={{i2.key.id()}}"><img src="{{i1.image_url()}}"/></a>
-        <td><a href="/?winner={{i2.key.id()}}&loser={{i1.key.id()}}"><img src="{{i2.image_url()}}"/></a>
-      </tr>
-    </table>
-    <a href="/">Just give me another</a>
+    <div class="row">
+        <div class="span12"><h2 style="text-align: center" id="generation"></h2></div>
+    </div>
+    <div class="row" style="text-align: center" id="matchrow">
+        <div class="span6" id="i1"></div>
+        <div class="span6" id="i2"></div>
+    </div>
+    <div class="row" style="text-align: center" id="skiprow">
+        <div class="span12"><a id="skip" class="btn btn-large" href="#">Skip</a></div>
+    </div>
+    <div class="row" id="historyrow">
+        <div class="span8 offset2">
+            <h3>History</h3>
+            <div id="history">
+            </div>
+            <p>Click on any curve in the history to learn more about it.</p>
+        </div>
+    </div>
 {% endblock %}

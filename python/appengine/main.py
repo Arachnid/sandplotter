@@ -1,3 +1,4 @@
+import json
 import logging
 import random
 import threading
@@ -70,18 +71,35 @@ class IndividualHandler(BaseHandler):
 
 class HomepageHandler(BaseHandler):
     def get(self):
+        self.render_template('index.html')
+
+
+class MatchupHandler(BaseHandler):
+    def get_auth_token(self, id1, id2, generation):
+        return ""
+
+    def record_vote(self, winner, loser, generation, auth_token):
+        model.Vote.record(ndb.Key(model.Individual, loser), ndb.Key(model.Individual, winner), generation)
+
+    def post(self):
         generation = memcache.get('current_generation')
         if not generation:
             generation = model.Generation.query().order(-model.Generation.number).get().number
             memcache.set('current_generation', generation)
         
-        winner = int(self.request.GET.get('winner', 0))
-        loser = int(self.request.GET.get('loser', 0))
+        winner = int(self.request.POST.get('winner', 0))
+        loser = int(self.request.POST.get('loser', 0))
         if winner and loser:
-            model.Vote.record(ndb.Key(model.Individual, loser), ndb.Key(model.Individual, winner), generation)
+            self.record_vote(winner, loser, generation, self.request.POST.get('auth_token'))
         
         i1, i2 = get_random_organisms(generation, 2)
-        self.render_template('index.html', generation=generation, i1=i1, i2=i2, winner=winner)
+        self.response.write(json.dumps({
+            'auth_token': self.get_auth_token(i1.key.id(), i2.key.id(), generation),
+            'generation': generation,
+            'i1': i1.as_dict(512),
+            'i2': i2.as_dict(512),
+        }))
+        
 
 class CronNextGenHandler(webapp2.RequestHandler):
     def get(self):
@@ -94,7 +112,8 @@ class CronNextGenHandler(webapp2.RequestHandler):
         
 
 app = webapp2.WSGIApplication([
-  (r'/individual/(\d+)', IndividualHandler),
   (r'/', HomepageHandler),
+  (r'/matchup', MatchupHandler),
+  (r'/individual/(\d+)', IndividualHandler),
   (r'/_ah/cron/nextgen', CronNextGenHandler),
 ])

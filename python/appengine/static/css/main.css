@@ -7,3 +7,15 @@ body {
     height: 64px;
     border: none
 }
+
+#skiprow {
+    padding-top: 1em;
+}
+
+#matchrow {
+    padding-top: 1em;
+}
+
+#history img {
+    padding-right: 10px;
+}
