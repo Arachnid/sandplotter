@@ -155,15 +155,9 @@ class BestHandler(BaseHandler):
         self.render_template('best.html', bests=bests, active='best')
 
 
-class CronNextGenHandler(webapp2.RequestHandler):
-    def get(self):
-        evolve.check_vote_count()
-        
-
 app = webapp2.WSGIApplication([
   (r'/', HomepageHandler),
   (r'/matchup', MatchupHandler),
   (r'/individual/(\d+)', IndividualHandler),
   (r'/best', BestHandler),
-  (r'/_ah/cron/nextgen', CronNextGenHandler),
 ])

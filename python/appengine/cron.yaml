@@ -1,4 +1,0 @@
-cron:
-- description: Create a new generation
-  url: /_ah/cron/nextgen
-  schedule: every 4 hours
