@@ -36,14 +36,14 @@ def rms_error(a, b):
     count = 0
     for k in a:
         count += 1
-        total_error += math.sqrt(abs(b[k] - a[k]))
-    return (total_error / count) ** 2
+        total_error += (b[k] - a[k]) ** 2
+    return math.sqrt(total_error) / count
 
 def score_generation(generation_id):
     """Scores and ranks a generation of individuals."""
     individuals = model.Individual.query(model.Individual.generation == generation_id).fetch()
     individuals = dict((x.key, x) for x in individuals)
-    scores = dict((i.key, i.score or 0) for i in individuals.values())
+    scores = dict((i.key, i.score or 1) for i in individuals.values())
 
     votes = model.Vote.query(model.Vote.generation == generation_id).fetch()
     edges = collections.defaultdict(list)
