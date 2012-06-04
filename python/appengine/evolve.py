@@ -114,4 +114,7 @@ def check_vote_count():
     logging.debug("Counted %d votes for %d individuals.", num_votes, last_generation.num_individuals)
     memcache.set("votes", num_votes)
     if num_votes > last_generation.num_individuals * 5:
-        evolve.next_generation
+        try:
+            defer(evolve.next_generation, _name="generation-%d" % (last_generation + 1))
+        except (taskqueue.TaskAlreadyExistsError, taskqueue.TombstonedTaskError):
+            pass
