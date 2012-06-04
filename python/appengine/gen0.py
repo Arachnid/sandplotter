@@ -1,3 +1,5 @@
+import evolve
+import model
 from piclang import *
 
 gen0_genomes = [
@@ -18,3 +20,9 @@ gen0_genomes = [
     [circle, (0.2, 0), scale, (1, 0), translate, 40, repeat, circle, rotate, 0.5, scale], # Zigzag circle
     [circle, (0.2, 0), scale, (1, 0), translate, 400, repeat, circle, 10, repeat, line, 0.1, translate, scale, rotate, 0.8, scale], # Zigzag circle spiral
 ]
+
+def init():
+    for genome in gen0_genomes:
+        model.Individual.create(genome=genome, generation=0, parents=[]).put()
+    model.Generation(number=0, num_individuals=len(gen0_genomes)).put()
+    evolve.next_generation()
