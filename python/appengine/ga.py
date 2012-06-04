@@ -7,6 +7,11 @@ ATOM_MUTATION_RATE = 1.0 # Atom mutations per organism
 OP_MUTATION_RATE = 0.5 # Operator mutations per organism
 CHANGE_TYPE_PROBABILITY = 0.1 # Chance an atom will change type
 
+def crossbreed(g1, g2):
+    """Crossbreeds two genomes and returns any viable children."""
+    children = cut_and_splice(g1, g2)
+    return [mutate(x) for x in children]
+
 def cut_and_splice(g1, g2):
     p1 = random.randrange(len(g1))
     p2 = random.randrange(len(g2))
@@ -16,7 +21,7 @@ def mutate(genome):
     atom_probability = ATOM_MUTATION_RATE / len(genome)
     op_probability = OP_MUTATION_RATE / len(genome)
     for i in range(len(genome)):
-        if isinstance(genome[i], (int, float, tuple, piclang.PlatonicCircle, piclang.PlatonicLine)):
+        if piclang.is_atom(genome[i]):
             if random.random() < atom_probability:
                 genome[i] = mutate_atom(genome[i])
         else:

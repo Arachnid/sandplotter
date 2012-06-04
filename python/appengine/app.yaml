@@ -7,6 +7,9 @@ threadsafe: true
 handlers:
 - url: /random
   script: randomcurve.app
+- url: /_ah/cron/.*
+  script: main.app
+  login: admin
 - url: /.*
   script: main.app
 
