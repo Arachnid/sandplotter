@@ -1,5 +1,8 @@
+import hashlib
+import hmac
 import json
 import logging
+import os
 import random
 import threading
 import webapp2
@@ -8,6 +11,7 @@ from google.appengine.ext.deferred import defer
 from google.appengine.ext import ndb
 from webapp2_extras import jinja2
 
+import config
 import evolve
 import piclang
 import model
@@ -89,11 +93,28 @@ class HomepageHandler(BaseHandler):
 
 
 class MatchupHandler(BaseHandler):
-    def get_auth_token(self, id1, id2, generation):
-        return ""
+    def get_auth_token(self, id1, id2, generation, nonce=None):
+        if id1 > id2:
+            id1, id2 = id2, id1
+        if nonce is None:
+            nonce = os.urandom(8).encode('base64')
+        token_text = "%d,%d,%d,%s" % (id1, id2, generation, nonce)
+        token_hash = hmac.new(config.token_key, token_text, hashlib.sha1).hexdigest()
+        return "%s,%s" % (token_hash, nonce)
+
+    def verify_token(self, token, id1, id2, generation):
+        token_hash, nonce = token.split(",")
+        return token == self.get_auth_token(id1, id2, generation, nonce=nonce)
 
     def record_vote(self, winner, loser, generation, auth_token):
+        if not self.verify_token(auth_token, winner, loser, generation):
+            logging.warn("Discarded vote (%d -> %d) with invalid token %s", loser, winner, auth_token)
+            return
+        if not memcache.add(auth_token, True):
+            logging.warn("Discarded vote (%d -> %d) with already used token %s", loser, winner, auth_token)
+            return
         model.Vote.record(ndb.Key(model.Individual, loser), ndb.Key(model.Individual, winner), generation)
+        logging.info("Recorded vote %d -> %d", loser, winner)
 
     def post(self):
         winner = int(self.request.POST.get('winner', 0))

@@ -56,7 +56,7 @@ def score_generation(generation_id):
         scores = new_scores
         new_scores = pagerank(scores, edges)
         steps += 1
-    logging.debug("Scores stabilized after %d steps", steps)
+    logging.info("Scores stabilized after %d steps", steps)
     score_rank = sorted(new_scores.items(), key=lambda (k, v): v, reverse=True)
     for rank, (key, score) in enumerate(score_rank):
         individuals[key].rank = rank
@@ -94,7 +94,7 @@ def new_generation(next_generation_id, num_individuals, individuals=None):
                 parents=[i1.key, i2.key])
             if child:
                 nextgen.append(child)
-        logging.debug("Generated %d individuals", len(nextgen))
+        logging.info("Generated %d individuals", len(nextgen))
     
     generation = model.Generation(id=next_generation_id, number=next_generation_id, num_individuals=len(nextgen))
     nextgen.append(generation)
