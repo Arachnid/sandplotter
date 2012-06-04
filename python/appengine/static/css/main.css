@@ -19,3 +19,7 @@ body {
 #history img {
     padding-right: 10px;
 }
+
+th {
+    vertical-align: top;
+}
