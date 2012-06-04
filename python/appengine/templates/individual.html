@@ -21,7 +21,7 @@
             {% endfor %}
         </td></tr>
     {% endif %}
-    {% if individual.rank %}
+    {% if individual.score is not none %}
         <tr><th>Rank</th><td>{{individual.rank}}</td></tr>
         <tr><th>Score</th><td>{{individual.score}}</td></tr>
     {% endif %}
