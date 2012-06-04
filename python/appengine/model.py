@@ -38,9 +38,8 @@ class Individual(ndb.Model):
             individual.put()
         return individual
 
-    @property
-    def image_url(self):
-        return images.get_serving_url(self.image)
+    def image_url(self, size=None):
+        return images.get_serving_url(self.image, size=size)
 
 
 class Vote(ndb.Model):

@@ -5,6 +5,8 @@ api_version: 1
 threadsafe: true
 
 handlers:
+- url: /static
+  static_dir: static
 - url: /random
   script: randomcurve.app
 - url: /_ah/cron/.*

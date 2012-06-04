@@ -56,10 +56,17 @@ class IndividualHandler(BaseHandler):
     if not individual:
         self.error(404)
         return
-    children = model.Individual.query(model.Individual.parents == individual.key).fetch(keys_only=True)
+    parents = ndb.get_multi(individual.parents)
+    children = model.Individual.query(model.Individual.parents == individual.key).fetch()
     genome = genome_repr(individual.genome)
     expression = piclang.stackparse(individual.genome)
-    self.render_template('individual.html', individual=individual, genome=genome, expression=expression, children=children)
+    self.render_template('individual.html',
+        individual=individual,
+        genome=genome,
+        expression=expression,
+        children=children,
+        parents=parents)
+
 
 class HomepageHandler(BaseHandler):
     def get(self):

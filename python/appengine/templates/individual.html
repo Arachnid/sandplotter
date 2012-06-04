@@ -2,22 +2,22 @@
 {% block title %}Individual #{{individual.key.id()}}{% endblock %}
 {% block body %}
 <h2>Individual #{{individual.key.id()}}</h2>
-<img src="{{individual.image_url}}" />
+<img src="{{individual.image_url()}}" />
 <table>
     <tr><th>Genome</th><td>{{genome}}</td></tr>
     <tr><th>Expression</th><td>{{expression}}</td></tr>
     <tr><th>Generation</th><td>{{individual.generation}}</td></tr>
     {% if individual.parents %}
         <tr><th>Parents</th><td>
-            {% for parent_key in individual.parents %}
-                <a href="/individual/{{parent_key.id()}}">#{{parent_key.id()}}</a>
+            {% for parent in parents %}
+                <a href="/individual/{{parent.key.id()}}"><img src="{{parent.image_url(64)}}" title="Individual #{{parent.key.id()}}" class="thumbnail"></a>
             {% endfor %}
         </td></tr>
     {% endif %}
     {% if children %}
         <tr><th>Children</th><td>
-            {% for child_key in children %}
-                <a href="/individual/{{child_key.id()}}">#{{child_key.id()}}</a>
+            {% for child in children %}
+                <a href="/individual/{{child.key.id()}}"><img src="{{child.image_url(64)}}" alt="Individual #{{child.key.id()}}" class="thumbnail"></a>
             {% endfor %}
         </td></tr>
     {% endif %}

@@ -4,6 +4,7 @@ import logging
 import math
 import random
 
+from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
 import ga
