@@ -5,6 +5,8 @@ import math
 import random
 
 from google.appengine.api import memcache
+from google.appengine.api import taskqueue
+from google.appengine.ext.deferred import defer
 from google.appengine.ext import ndb
 
 import ga
@@ -100,6 +102,7 @@ def new_generation(next_generation_id, num_individuals, individuals=None):
     nextgen.append(generation)
     ndb.put_multi(nextgen)
     memcache.set('current_generation', next_generation_id)
+    memcache.set('votes', 0)
 
 
 def next_generation():
@@ -115,6 +118,6 @@ def check_vote_count():
     memcache.set("votes", num_votes)
     if num_votes > last_generation.num_individuals * 5:
         try:
-            defer(evolve.next_generation, _name="generation-%d" % (last_generation + 1))
+            defer(next_generation, _name="generation-%d" % (last_generation.number + 1))
         except (taskqueue.TaskAlreadyExistsError, taskqueue.TombstonedTaskError):
             pass
