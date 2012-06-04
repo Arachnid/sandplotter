@@ -10,14 +10,14 @@
     {% if individual.parents %}
         <tr><th>Parents</th><td>
             {% for parent in parents %}
-                <a href="/individual/{{parent.key.id()}}"><img src="{{parent.image_url(64)}}" title="Individual #{{parent.key.id()}}" class="thumbnail"></a>
+                <a href="/individual/{{parent.key.id()}}"><img src="{{parent.image_url(64)}}" title="Individual #{{parent.key.id()}}" class="thumb"></a>
             {% endfor %}
         </td></tr>
     {% endif %}
     {% if children %}
         <tr><th>Children</th><td>
             {% for child in children %}
-                <a href="/individual/{{child.key.id()}}"><img src="{{child.image_url(64)}}" alt="Individual #{{child.key.id()}}" class="thumbnail"></a>
+                <a href="/individual/{{child.key.id()}}"><img src="{{child.image_url(64)}}" alt="Individual #{{child.key.id()}}" class="thumb"></a>
             {% endfor %}
         </td></tr>
     {% endif %}
