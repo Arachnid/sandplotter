@@ -21,8 +21,9 @@
             {% endfor %}
         </td></tr>
     {% endif %}
-    <tr><th>Matches</th><td>{{individual.matches}}</td></tr>
-    <tr><th>Rank</th><td>{{individual.rank}}</td></tr>
-    <tr><th>Score</th><td>{{individual.score}}</td></tr>
+    {% if individual.rank %}
+        <tr><th>Rank</th><td>{{individual.rank}}</td></tr>
+        <tr><th>Score</th><td>{{individual.score}}</td></tr>
+    {% endif %}
 </table>
 {% endblock %}
