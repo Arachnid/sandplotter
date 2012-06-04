@@ -62,6 +62,7 @@ def score_generation(generation_id):
         individuals[key].rank = rank
         individuals[key].score = score
     ndb.put_multi(individuals.values())
+    return individuals.values()
 
 class WeightedRandomGenerator(object):
     def __init__(self, weights):
@@ -77,8 +78,9 @@ class WeightedRandomGenerator(object):
         return bisect.bisect_right(self.totals, rnd)
 
 
-def new_generation(next_generation_id, num_individuals):
-    individuals = model.Individual.query(model.Individual.generation == next_generation_id - 1).fetch()
+def new_generation(next_generation_id, num_individuals, individuals=None):
+    if not individuals:
+        individuals = model.Individual.query(model.Individual.generation == next_generation_id - 1).fetch()
     weights = WeightedRandomGenerator(i.score for i in individuals)
 
     nextgen = []
@@ -102,5 +104,5 @@ def new_generation(next_generation_id, num_individuals):
 
 def next_generation():
     last_generation = model.Generation.query().order(-model.Generation.number).get()
-    score_generation(last_generation.number)
-    new_generation(last_generation.number + 1, 100)
+    individuals = score_generation(last_generation.number)
+    new_generation(last_generation.number + 1, 100, individuals=individuals)
