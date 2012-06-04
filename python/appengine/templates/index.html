@@ -43,6 +43,12 @@
                     i2_box.children().empty();
                     i2_box.append(create_matchup_image(data.i2, data.i1));
                     
+                    if(data.progress == null) {
+                        $("#progress").hide();
+                    } else {
+                        $("#progress").show().children().first().css("width", data.progress + "%");
+                    }
+                    
                     auth_token = data.auth_token;
                 }, "json");
             }
@@ -52,6 +58,7 @@
             });
             
             $("#historyrow").hide();
+            $("#progress").hide()
             next_matchup();
         });
     </script>
@@ -61,6 +68,9 @@
     
     <div class="row">
         <div class="span12"><h2 style="text-align: center" id="generation"></h2></div>
+    </div>
+    <div class="progress" id="progress">
+        <div class="bar"></div>
     </div>
     <div class="row" style="text-align: center" id="matchrow">
         <div class="span6" id="i1"></div>

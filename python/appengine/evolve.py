@@ -106,3 +106,12 @@ def next_generation():
     last_generation = model.Generation.query().order(-model.Generation.number).get()
     individuals = score_generation(last_generation.number)
     new_generation(last_generation.number + 1, 100, individuals=individuals)
+
+def check_vote_count():
+    last_generation = model.Generation.query().order(-model.Generation.number).get()
+    votes = model.Vote.query(model.Vote.generation == last_generation.number).fetch()
+    num_votes = sum(v.count for v in votes)
+    logging.debug("Counted %d votes for %d individuals.", num_votes, last_generation.num_individuals)
+    memcache.set("votes", num_votes)
+    if num_votes > last_generation.num_individuals * 5:
+        evolve.next_generation

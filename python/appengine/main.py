@@ -1,12 +1,15 @@
+import datetime
 import hashlib
 import hmac
 import json
 import logging
 import os
 import random
+import time
 import threading
 import webapp2
 from google.appengine.api import memcache
+from google.appengine.api import taskqueue
 from google.appengine.ext.deferred import defer
 from google.appengine.ext import ndb
 from webapp2_extras import jinja2
@@ -114,13 +117,24 @@ class MatchupHandler(BaseHandler):
             logging.warn("Discarded vote (%d -> %d) with already used token %s", loser, winner, auth_token)
             return
         model.Vote.record(ndb.Key(model.Individual, loser), ndb.Key(model.Individual, winner), generation)
+        vote_total = memcache.incr("votes", 1)
+        if vote_total is None or vote_total > 500:
+            # Vote counter has been evicted, or we're ready for a new generation
+            interval = datetime.datetime.now().replace(second=0, microsecond=0)
+            try:
+                defer(evolve.check_vote_count, _name="check_vote_count-%s" % interval.strftime("%Y%m%d%H%M"))
+            except (taskqueue.TaskAlreadyExistsError, taskqueue.TombstonedTaskError), e:
+                pass
         logging.info("Recorded vote %d -> %d", loser, winner)
+        return vote_total
 
     def post(self):
         winner = int(self.request.POST.get('winner', 0))
         loser = int(self.request.POST.get('loser', 0))
         if winner and loser:
-            self.record_vote(winner, loser, self.generation, self.request.POST.get('auth_token'))
+            num_votes = self.record_vote(winner, loser, self.generation, self.request.POST.get('auth_token'))
+        else:
+            num_votes = memcache.get("votes")
         
         i1, i2 = get_random_organisms(self.generation, 2)
         self.response.write(json.dumps({
@@ -128,6 +142,7 @@ class MatchupHandler(BaseHandler):
             'generation': self.generation,
             'i1': i1.as_dict(512),
             'i2': i2.as_dict(512),
+            'progress': num_votes and "%.1f" % (min(num_votes / 500.0, 1.0) * 100,)
         }))
 
 
@@ -142,12 +157,7 @@ class BestHandler(BaseHandler):
 
 class CronNextGenHandler(webapp2.RequestHandler):
     def get(self):
-        last_generation = model.Generation.query().order(-model.Generation.number).get()
-        votes = model.Vote.query(model.Vote.generation == last_generation.number).fetch()
-        num_votes = sum(v.count for v in votes)
-        logging.debug("Counted %d votes for %d individuals.", num_votes, last_generation.num_individuals)
-        if num_votes > last_generation.num_individuals * 5:
-            defer(evolve.next_generation)
+        evolve.check_vote_count()
         
 
 app = webapp2.WSGIApplication([
