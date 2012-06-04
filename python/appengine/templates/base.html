@@ -28,9 +28,9 @@
                 <a class="brand" href="#">Rate my curve</a>
                 <div class="nav-collpase">
                     <ul class="nav">
-                        <li class="active"><a href="#">Home</a></li>
-                        <li><a href="/best">Best</a></li>
-                        <li><a href="/about">About</a></li>
+                        <li {% if active=="home" %}class="active"{% endif %}><a href="/">Home</a></li>
+                        <li {% if active=="best" %}class="active"{% endif %}><a href="/best">Best</a></li>
+                        <li {% if active=="about" %}class="active"{% endif %}><a href="/about">About</a></li>
                     </ul>
                 </div>
             </div>

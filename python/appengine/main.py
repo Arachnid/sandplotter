@@ -85,7 +85,7 @@ class IndividualHandler(BaseHandler):
 
 class HomepageHandler(BaseHandler):
     def get(self):
-        self.render_template('index.html')
+        self.render_template('index.html', active='home')
 
 
 class MatchupHandler(BaseHandler):
@@ -116,7 +116,7 @@ class BestHandler(BaseHandler):
         
     def get(self):
         bests = [(gen, self.get_best(gen, 5)) for gen in range(self.generation - 1, 0, -1)]
-        self.render_template('best.html', bests=bests)
+        self.render_template('best.html', bests=bests, active='best')
 
 
 class CronNextGenHandler(webapp2.RequestHandler):
