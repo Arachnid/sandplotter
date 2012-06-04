@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block body %}
+    <h2>Best curves in each generation</h2>
+    {% for gen, individuals in bests %}
+        <h3>Generation {{gen}}</h3>
+        {% for individual in individuals %}
+            <a href="/individual/{{individual.key.id()}}"><img src="{{individual.image_url(128)}}" class="bigthumb"></a>
+        {% endfor %}
+    {% endfor %}
+{% endblock %}

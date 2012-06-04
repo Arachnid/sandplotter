@@ -2,10 +2,16 @@ body {
     padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
 }
 
-.thumbnail {
+.thumb {
     width: 64px;
     height: 64px;
     border: none
+}
+
+.bigthumb {
+    width: 128px;
+    height: 128px;
+    border: none;
 }
 
 #skiprow {

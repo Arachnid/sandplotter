@@ -14,3 +14,8 @@ indexes:
   properties:
   - name: generation
   - name: random
+
+- kind: Individual
+  properties:
+  - name: generation
+  - name: rank

@@ -29,12 +29,26 @@ def get_random_organisms(generation, num=1):
 
 
 class BaseHandler(webapp2.RequestHandler):
+    def __init__(self, *args, **kwargs):
+        super(BaseHandler, self).__init__(*args, **kwargs)
+        self._generation = None
+
     @webapp2.cached_property
     def jinja2(self):
         return jinja2.get_jinja2(app=self.app)
     
     def render_template(self, filename, **template_args):
         self.response.write(self.jinja2.render_template(filename, **template_args))
+
+    @property
+    def generation(self):
+        if not self._generation:
+            self._generation = memcache.get('current_generation')
+            if not self._generation:
+                self._generation = model.Generation.query().order(-model.Generation.number).get().number
+                memcache.set('current_generation', self._generation)
+        return self._generation
+
 
 def genome_repr(g):
     genome = []
@@ -82,24 +96,28 @@ class MatchupHandler(BaseHandler):
         model.Vote.record(ndb.Key(model.Individual, loser), ndb.Key(model.Individual, winner), generation)
 
     def post(self):
-        generation = memcache.get('current_generation')
-        if not generation:
-            generation = model.Generation.query().order(-model.Generation.number).get().number
-            memcache.set('current_generation', generation)
-        
         winner = int(self.request.POST.get('winner', 0))
         loser = int(self.request.POST.get('loser', 0))
         if winner and loser:
-            self.record_vote(winner, loser, generation, self.request.POST.get('auth_token'))
+            self.record_vote(winner, loser, self.generation, self.request.POST.get('auth_token'))
         
-        i1, i2 = get_random_organisms(generation, 2)
+        i1, i2 = get_random_organisms(self.generation, 2)
         self.response.write(json.dumps({
-            'auth_token': self.get_auth_token(i1.key.id(), i2.key.id(), generation),
-            'generation': generation,
+            'auth_token': self.get_auth_token(i1.key.id(), i2.key.id(), self.generation),
+            'generation': self.generation,
             'i1': i1.as_dict(512),
             'i2': i2.as_dict(512),
         }))
+
+
+class BestHandler(BaseHandler):
+    def get_best(self, generation, count):
+        return model.Individual.query(model.Individual.generation == generation).order(model.Individual.rank).fetch(count)
         
+    def get(self):
+        bests = [(gen, self.get_best(gen, 5)) for gen in range(self.generation - 1, 0, -1)]
+        self.render_template('best.html', bests=bests)
+
 
 class CronNextGenHandler(webapp2.RequestHandler):
     def get(self):
@@ -115,5 +133,6 @@ app = webapp2.WSGIApplication([
   (r'/', HomepageHandler),
   (r'/matchup', MatchupHandler),
   (r'/individual/(\d+)', IndividualHandler),
+  (r'/best', BestHandler),
   (r'/_ah/cron/nextgen', CronNextGenHandler),
 ])
