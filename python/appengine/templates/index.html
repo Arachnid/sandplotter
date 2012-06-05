@@ -40,6 +40,7 @@
                     history.append(history_link);
                     
                     $("#historyrow").show();
+                    $("#aboutrow").hide();
                 }
                 
                 var i1_box = $("#i1");
@@ -73,8 +74,6 @@
     </script>
 {% endblock %}
 {% block body %}
-    <p>Click on the curve that you like best.</p>
-    
     <div class="row">
         <div class="span12"><h2 style="text-align: center" id="generation"></h2></div>
     </div>
@@ -87,6 +86,9 @@
     </div>
     <div class="row" style="text-align: center" id="skiprow">
         <div class="span12"><a id="skip" class="btn btn-large" href="#">Skip</a></div>
+    </div>
+    <div class="row" id="aboutrow">
+        <p>Click on the curve that you like best.</p>
     </div>
     <div class="row" id="historyrow">
         <div class="span8 offset2">

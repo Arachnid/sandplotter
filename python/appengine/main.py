@@ -129,7 +129,6 @@ class MatchupHandler(BaseHandler):
         return vote_total
 
     def post(self):
-        time.sleep(2)
         winner = int(self.request.POST.get('winner', 0))
         loser = int(self.request.POST.get('loser', 0))
         if winner and loser:
