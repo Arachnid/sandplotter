@@ -17,7 +17,7 @@ class Individual(ndb.Model):
 
     @classmethod
     def create(cls, genome, generation, parents, store=False):
-        fun = piclang.stackparse(genome)
+        fun = piclang.stackparse(genome, normalize=True)
         if piclang.is_atom(fun):
             return None
         image = piclang.render(fun, points=8192)
