@@ -1,12 +1,20 @@
 {% extends "base.html" %}
 {% block head %}
     <script type="text/javascript">
+        var img_size = 512;
+        var thumb_size = 64;
+        var num_thumbs = 10;
+        
         $(document).ready(function() {
             var auth_token = undefined;
             
+            function make_img(src, size) {
+                return $("<img>").attr('src', src).width(size).height(size);
+            }
+            
             function create_matchup_image(individual, other) {
                 var a = $("<a>");
-                a.append($("<img>").attr('src', individual.image).width(512).height(512));
+                a.append(make_img(individual.image, img_size));
                 a.click(function() {
                     next_matchup(individual, other)
                 });
@@ -22,25 +30,26 @@
                     args['auth_token'] = auth_token;
 
                     var history = $("#history");
-                    if(history.children().size() >= 10) {
+                    if(history.children().size() >= num_thumbs) {
                         history.children().first().remove();
                     }
                     var history_link = $("<a>");
-                    history_link.append($("<img>").attr('src', winner.image).width(64).height(64));
+                    history_link.append(make_img(winner.image, thumb_size));
                     history_link.attr("href", "/individual/" + winner.id);
                     history_link.attr("target", "_blank");
                     history.append(history_link);
                     
                     $("#historyrow").show();
                 }
+                
+                var i1_box = $("#i1");
+                i1_box.empty();
+                var i2_box = $("#i2");
+                i2_box.empty();
+                                
                 $.post('/matchup', args, function(data) {
                     $("#generation").text("Generation " + data.generation)
-                    var i1_box = $("#i1");
-                    i1_box.children().empty();
                     i1_box.append(create_matchup_image(data.i1, data.i2));
-                    
-                    var i2_box = $("#i2");
-                    i2_box.children().empty();
                     i2_box.append(create_matchup_image(data.i2, data.i1));
                     
                     if(data.progress == null) {
