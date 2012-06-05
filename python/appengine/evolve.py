@@ -45,7 +45,8 @@ def score_generation(generation_id):
     """Scores and ranks a generation of individuals."""
     individuals = model.Individual.query(model.Individual.generation == generation_id).fetch()
     individuals = dict((x.key, x) for x in individuals)
-    scores = dict((i.key, i.score or 1) for i in individuals.values())
+    start_score = 1.0 / len(individuals)
+    scores = dict((i.key, i.score or start_score) for i in individuals.values())
 
     votes = model.Vote.query(model.Vote.generation == generation_id).fetch()
     edges = collections.defaultdict(list)
