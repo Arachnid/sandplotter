@@ -381,7 +381,7 @@ class PicStack(object):
     
     def _popone(self):
         if not self._stack:
-            return 0
+            return (0, frozenset())
         self._stackptr -= 1
         if self._stackptr < 0:
             self._stackptr = min(len(self._stack), 8) - 1
@@ -408,21 +408,23 @@ def is_operator(obj):
     return (isinstance(obj, Curve) and not is_atom(obj)) or obj == boustro
 
 
-def stackparse(expr):
+def stackparse(expr, normalize=False):
     """Parses a stack-based representation of a curve expression, returning the expression tree."""
     stack = PicStack()
-    for token in expr:
-        if isinstance(token, (PlatonicCircle, PlatonicLine)):
-            stack.push(token)
-        elif isinstance(token, (int, float, tuple)):
-            stack.push(token)
+    for i, token in enumerate(expr):
+        if isinstance(token, (PlatonicCircle, PlatonicLine, int, float, tuple)):
+            stack.push((token, frozenset([i])))
         elif callable(token):
             if inspect.isclass(token):
                 argcount = len(inspect.getargspec(token.__init__)[0]) - 1
             else:
                 argcount = len(inspect.getargspec(token)[0])
-            stack.push(token(*stack.pop(argcount)))
-    return stack.pop()[0]
+            args, cliques = zip(*stack.pop(argcount))
+            stack.push((token(*args), frozenset([i]).union(*cliques)))
+    result, clique = stack.pop()[0]
+    if normalize:
+        expr[:] = [token for i, token in enumerate(expr) if i in clique]
+    return result
 
 
 repl_doc = """
